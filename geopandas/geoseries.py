@@ -28,25 +28,33 @@ def _convert_array_args(args):
         args = ([args[0]],)
     return args
 
+
 class _CoordinateIndexer(_NDFrameIndexer):
     """ Indexing by coordinate slices """
     def _getitem_tuple(self, tup):
         obj = self.obj
         xs, ys = tup
-        # handle numeric values as x and/or y coordinate index
+        # Handle numeric values as x and/or y coordinate index
         if type(xs) is not slice:
             xs = slice(xs, xs)
         if type(ys) is not slice:
             ys = slice(ys, ys)
-        # don't know how to handle step; should this raise?
+        # Don't know how to handle step; should this raise?
         if xs.step is not None or ys.step is not None:
             warn("Ignoring step - full interval is used.")
         xmin, ymin, xmax, ymax = obj.total_bounds
-        bbox = box(xs.start or xmin,
-                   ys.start or ymin,
-                   xs.stop or xmax,
-                   ys.stop or ymax)
-        idx = obj.intersects(bbox)
+        bbox = (xs.start or xmin,
+                ys.start or ymin,
+                xs.stop or xmax,
+                ys.stop or ymax)
+
+        if obj._sindex:  # If we have a spatial index, use it
+            # Use spatial index to reduce # of queries
+            gen = obj._sindex.intersection(bbox, objects='raw')
+            # Now do more accurate checks on subset
+            idx = obj.ix[gen].intersects(box(*bbox))
+        else:  # Fallback to naive checks if no index
+            idx = obj.intersects(box(*bbox))
         return obj[idx]
 
 
