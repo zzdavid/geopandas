@@ -141,10 +141,23 @@ class TestSeries(unittest.TestCase):
 
     def test_coord_slice(self):
         """ Test CoordinateSlicer """
-        # need some better test cases
+        # Need some better test cases
         self.assertTrue(geom_equals(self.g3, self.g3.cx[:, :]))
-        self.assertTrue(geom_equals(self.g3[[True, False]], self.g3.cx[0.9:, :0.1]))
-        self.assertTrue(geom_equals(self.g3[[False, True]], self.g3.cx[0:0.1, 0.9:1.0]))
+        self.assertTrue(geom_equals(self.g3[[True, False]],
+                        self.g3.cx[0.9:, :0.1]))
+        self.assertTrue(geom_equals(self.g3[[False, True]],
+                        self.g3.cx[0:0.1, 0.9:1.0]))
+
+        # Check that 'no spatial index' fails gracefully
+        self.g3._sindex = None  # Kill the spatial index
+        self.assertTrue(geom_equals(self.g3, self.g3.cx[:, :]))
+        self.assertTrue(geom_equals(self.g3[[True, False]],
+                        self.g3.cx[0.9:, :0.1]))
+        self.assertTrue(geom_equals(self.g3[[False, True]],
+                        self.g3.cx[0:0.1, 0.9:1.0]))
+        self.g3._generate_sindex()  # Regenerate the index
+
+
 
 if __name__ == '__main__':
     unittest.main()
