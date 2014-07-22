@@ -5,3 +5,4 @@ matplotlib>=1.2.1
 descartes>=1.0
 pytest-cov
 coveralls
+pysal

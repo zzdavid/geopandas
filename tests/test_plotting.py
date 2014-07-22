@@ -10,10 +10,10 @@ matplotlib.use('Agg', warn=False)
 from matplotlib.pyplot import Artist, savefig, clf
 from matplotlib.testing.noseclasses import ImageComparisonFailure
 from matplotlib.testing.compare import compare_images
-from shapely.geometry import Polygon, LineString, Point
+from shapely.geometry import Polygon, LineString, Point, MultiPolygon, MultiLineString
 from six.moves import xrange
 
-from geopandas import GeoSeries
+from geopandas import GeoSeries, GeoDataFrame
 
 
 # If set to True, generate images rather than perform tests (all tests will pass!)
@@ -56,6 +56,18 @@ class PlotTests(unittest.TestCase):
         ax = polys.plot()
         self._compare_images(ax=ax, filename=filename)
 
+    def test_multipoly_plot(self):
+        """ Test plotting a simple series of multipolygons """
+        clf()
+        filename = 'multipoly_plot.png'
+        t1 = Polygon([(0, 0), (1, 0), (1, 1)])
+        t2 = Polygon([(1, 0), (2, 0), (2, 1)])
+        t3 = Polygon([(2, 0), (3, 0), (3, 1)], [[(2.2, 0.1), (2.8, 0.1), (2.8, 0.7)]])
+        t12 = MultiPolygon([t1, t2, t3])
+        mpolys = GeoSeries([t12])
+        ax = mpolys.plot()
+        self._compare_images(ax=ax, filename=filename)
+
     def test_point_plot(self):
         """ Test plotting a simple series of points """
         clf()
@@ -72,6 +84,39 @@ class PlotTests(unittest.TestCase):
         N = 10
         lines = GeoSeries([LineString([(0, i), (9, i)]) for i in xrange(N)])
         ax = lines.plot()
+        self._compare_images(ax=ax, filename=filename)
+
+    def test_multiline_plot(self):
+        """ Test plotting a multilinestring """
+        clf()
+        filename = 'multilines_plot.png'
+        N = 10
+        mlines = GeoSeries(MultiLineString(
+            [LineString([(0, i), (9, i)]) for i in xrange(N)]))
+        ax = mlines.plot()
+        self._compare_images(ax=ax, filename=filename)
+
+    def test_dataframe_plot(self):
+        """ Test plotting a geodataframe"""
+        clf()
+        df = GeoDataFrame([
+            {'geometry': Polygon([(0, 0), (1, 0), (1, 1)]), 'value1': 1, 'cat1': 'low'},
+            {'geometry': Polygon([(1, 0), (2, 0), (2, 1)]), 'value1': 2, 'cat1': 'med'},
+            {'geometry': Polygon([(2, 0), (3, 0), (3, 1)]), 'value1': 3, 'cat1': 'high'},
+            {'geometry': Polygon([(0, 1), (1, 1), (1, 2)]), 'value1': 4, 'cat1': 'low'},
+            {'geometry': Polygon([(1, 1), (2, 1), (2, 2)]), 'value1': 5, 'cat1': 'med'},
+            {'geometry': Polygon([(2, 1), (3, 1), (3, 2)]), 'value1': 6, 'cat1': 'high'},
+            {'geometry': Polygon([(0, 2), (1, 2), (1, 3)]), 'value1': 7, 'cat1': 'low'},
+            {'geometry': Polygon([(1, 2), (2, 2), (2, 3)]), 'value1': 8, 'cat1': 'med'},
+            {'geometry': Polygon([(2, 2), (3, 2), (3, 3)]), 'value1': 9, 'cat1': 'high'},
+        ])
+
+        filename = 'poly_df_plot.png'
+        ax = df.plot(column='value1', scheme='QUANTILES', k=3, colormap='OrRd')
+        self._compare_images(ax=ax, filename=filename)
+
+        filename = 'poly_df_category_plot.png'
+        ax = df.plot(column='cat1', legend=True, categorical=True, alpha=1.0)
         self._compare_images(ax=ax, filename=filename)
 
 if __name__ == '__main__':
