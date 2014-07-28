@@ -3,6 +3,6 @@ SQLAlchemy>=0.8.3
 geopy>=0.99
 matplotlib>=1.2.1
 descartes>=1.0
-pyest==2.6.0
+pytest==2.6.0
 pytest-cov==1.7.0  
 coveralls
