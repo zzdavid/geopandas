@@ -12,10 +12,7 @@ if [[ $TRAVIS_PYTHON_VERSION == '2.6' ]]; then
 fi
 
 if [[ $PANDAS_VERSION == 'master' ]]; then
-    git clone git://github.com/pydata/pandas.git
-    cd pandas
-    git checkout $PANDAS_VERSION
-    python setup.py install
+    pip install git+git://github.com/pydata/pandas.git
 else
     pip install $PIP_OPTIONS pandas==$PANDAS_VERSION
 fi
