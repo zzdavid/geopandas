@@ -1,3 +1,0 @@
-fiona
-shapely
-pyproj
