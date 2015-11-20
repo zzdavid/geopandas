@@ -16,7 +16,7 @@ import sys, os
 # readthedocs can't handle libraries with binary dependencies
 import mock
 
-MOCK_MODULES = ['shapely', 'Fiona', 'pyproj', 'rtree']
+MOCK_MODULES = ['shapely', 'Fiona', 'pyproj', 'rtree', 'gdal']
 for mod_name in MOCK_MODULES:
     sys.modules[mod_name] = mock.Mock()
 
