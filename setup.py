@@ -28,7 +28,7 @@ such as PostGIS.
 """
 
 MAJOR = 0
-MINOR = 1
+MINOR = 2
 MICRO = 0
 ISRELEASED = False
 VERSION = '%d.%d.%d' % (MAJOR, MINOR, MICRO)
