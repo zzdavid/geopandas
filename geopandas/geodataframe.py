@@ -398,6 +398,18 @@ class GeoDataFrame(GeoPandasBase, DataFrame):
             result.__class__ = DataFrame
         return result
 
+    def join(self, *args, **kwargs):
+        result = DataFrame.join(self, *args, **kwargs)
+        geo_col = self._geometry_column_name
+        if isinstance(result, DataFrame) and geo_col in result:
+            result.__class__ = GeoDataFrame
+            result.crs = self.crs
+            result._geometry_column_name = geo_col
+            result._invalidate_sindex()
+        elif isinstance(result, DataFrame) and geo_col not in result:
+            result.__class__ = DataFrame
+        return result
+
     @property
     def _constructor(self):
         return GeoDataFrame
